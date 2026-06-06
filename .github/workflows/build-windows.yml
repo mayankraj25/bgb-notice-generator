@@ -1,0 +1,53 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]       # auto-builds every time you push code changes
+  workflow_dispatch:          # also lets you trigger it manually from GitHub
+
+jobs:
+  build-windows:
+    runs-on: windows-latest   # GitHub spins up a real Windows machine
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install openpyxl python-docx python-dateutil pyinstaller
+
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller app_gui.py `
+            --onefile `
+            --windowed `
+            --name "BGB_Notice_Generator" `
+            --hidden-import openpyxl `
+            --hidden-import openpyxl.styles `
+            --hidden-import openpyxl.utils `
+            --hidden-import docx `
+            --hidden-import docx.shared `
+            --hidden-import docx.enum.text `
+            --hidden-import docx.enum.table `
+            --hidden-import docx.oxml `
+            --hidden-import docx.oxml.ns `
+            --hidden-import dateutil `
+            --hidden-import dateutil.parser `
+            --hidden-import dateutil.relativedelta `
+            --hidden-import excel_parser `
+            --hidden-import letter_generator `
+            --hidden-import amount_to_words `
+            --hidden-import utils
+
+      - name: Upload EXE as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BGB-Notice-Generator-Windows
+          path: dist/BGB_Notice_Generator.exe
+          retention-days: 30    # file stays downloadable for 30 days
