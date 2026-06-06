@@ -28,8 +28,11 @@ def submission_deadline(validity_date: date) -> date:
 
 
 def format_date(d: date) -> str:
-    """Format date as '29 Nov 2021'."""
-    return d.strftime("%-d %b %Y")
+    """Format date as '29 Nov 2021'. Cross-platform (Mac + Windows)."""
+    # %-d removes leading zero on Mac/Linux; %#d does the same on Windows
+    import sys
+    fmt = "%#d %b %Y" if sys.platform == "win32" else "%-d %b %Y"
+    return d.strftime(fmt)
 
 
 def format_date_short(d: date) -> str:
