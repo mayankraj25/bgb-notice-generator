@@ -299,6 +299,17 @@ class BGBApp(tk.Tk):
         t.start()
 
     def _run_generation(self, excel_path: str, letter_date: date):
+        # Outer safety net — catches ANY unhandled exception in the thread
+        # and shows it in the log instead of silently freezing the UI.
+        try:
+            self._run_generation_inner(excel_path, letter_date)
+        except Exception as e:
+            import traceback
+            self.after(0, self._log_write,
+                       f"✗ Unexpected error: {e}\n{traceback.format_exc()}", "err")
+            self.after(0, self._reset_button)
+
+    def _run_generation_inner(self, excel_path: str, letter_date: date):
         today         = date.today()
         letter_type   = self._letter_type.get()
         letter_number = self._letter_num.get().strip()

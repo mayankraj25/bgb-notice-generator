@@ -2,12 +2,12 @@ name: Build Windows EXE
 
 on:
   push:
-    branches: [ main ]       # auto-builds every time you push code changes
-  workflow_dispatch:          # also lets you trigger it manually from GitHub
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-windows:
-    runs-on: windows-latest   # GitHub spins up a real Windows machine
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -28,26 +28,21 @@ jobs:
             --onefile `
             --windowed `
             --name "BGB_Notice_Generator" `
-            --hidden-import openpyxl `
-            --hidden-import openpyxl.styles `
-            --hidden-import openpyxl.utils `
-            --hidden-import docx `
-            --hidden-import docx.shared `
-            --hidden-import docx.enum.text `
-            --hidden-import docx.enum.table `
-            --hidden-import docx.oxml `
-            --hidden-import docx.oxml.ns `
-            --hidden-import dateutil `
-            --hidden-import dateutil.parser `
-            --hidden-import dateutil.relativedelta `
+            --collect-all openpyxl `
+            --collect-all docx `
+            --collect-all dateutil `
             --hidden-import excel_parser `
             --hidden-import letter_generator `
             --hidden-import amount_to_words `
-            --hidden-import utils
+            --hidden-import utils `
+            --add-data "excel_parser.py;." `
+            --add-data "letter_generator.py;." `
+            --add-data "amount_to_words.py;." `
+            --add-data "utils.py;."
 
       - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
           name: BGB-Notice-Generator-Windows
           path: dist/BGB_Notice_Generator.exe
-          retention-days: 30    # file stays downloadable for 30 days
+          retention-days: 30
